@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-lg-8 col-xl-6">
+        <div class="card rounded-3">
+              <div class="card-body p-4 p-md-5">
+                  <div class="form-outline mb-4">
+                  <h2 class="b"><b class="mb-4 pb-2 pb-md-0 mb-md-5 px-md-2">Application Form</b></h2>
+                  </div>
+                  <div class="horizontal-radio">
+
+
+                      <form class="px-md-2" method="POST" action="" %}">
+                      {% csrf_token %}
+                           <table>
+                           {{ forms.as_table }}
+                           </table>
+                           <input class="btn btn-success" type="submit">
+                            <a class="btn btn-success" href="{% url 'login'  %}">logout</a>
+                      <a href="{% url 'index'  %}">Return to Home Page</a>
+                      </form>
+
+                      <script>
+                          function getCookie(name) {
+                          let cookieValue = null;
+                          if (document.cookie && document.cookie !== '') {
+                          const cookies = document.cookie.split(';');
+                          for (let i = 0; i < cookies.length; i++) {
+                          const cookie = cookies[i].trim();
+                          // Does this cookie string begin with the name we want?
+                          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                          break;
+                        }
+                        }
+                        }
+                        return cookieValue;
+                        }
+                        const csrftoken = getCookie('csrftoken');
+
+
+
+
+                          let department_field = document.getElementById("id_department")
+                          let course_field = document.getElementById("id_course")
+
+
+                          department_field.addEventListener("change",getDepartmentId)
+
+                          function getDepartmentId(e){
+                              console.log(e.target.value)
+                              let department_id = e.target.value
+
+                              const data={'id':department_id};
+
+                              let url = "{% url 'getcourse' %}"
+                          fetch(url,{
+                          method : 'POST',// or 'PUT'
+                          headers: {
+                              'Content-Type':'application/json',
+                              'X-CSRFToken': csrftoken
+                          },
+                          body:JSON.stringify(data),
+                          })
+                          .then(response => response.json())
+                          .then(data => {
+                          console.log('Success:', data);
+                          course_field.innerHTML = '<option value="" selected="">-----------</option>'
+                          for(let i = 0; i < data.length; i++){
+                          course_field.innerHTML += `<option value="${data[i]["id"]}" selected="">${data[i]["name"]}</option>`
+                          }
+                          })
+                          .catch((error) => {
+                          console.error('Error:', error);
+                          });
+                          }
+                      </script>
+                  </div>
+
+                   {% for msg in messages %}
+                      <h4 style="text-align:center">{{msg}}</h4>
+                      {% endfor %}
+                  </div>
+                  </div>
+             </div>
+        </div>
+     </div>
+{% endblock %}
